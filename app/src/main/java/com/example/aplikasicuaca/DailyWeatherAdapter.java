@@ -1,8 +1,11 @@
 package com.example.aplikasicuaca;
 
+import android.graphics.Color;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +32,8 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         // bind the data to the views in each item of the RecyclerView
         ModelDailyWeather dailyWeatherObj = mDailyWeatherList.get(position);
         holder.timeTextView.setText(dailyWeatherObj.time);
-        holder.weatherCodeTextView.setText(String.valueOf(dailyWeatherObj.weatherCode));
+        holder.weatherCodeTextView.setText(WeatherUtils.getWeatherText(dailyWeatherObj.weatherCode));
+        holder.ivWeatherCode.setImageResource(WeatherUtils.getWeatherIcon(dailyWeatherObj.weatherCode));
     }
 
     @Override
@@ -41,10 +45,16 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         TextView timeTextView;
         TextView weatherCodeTextView;
 
+        ImageView ivWeatherCode;
+
         public ViewHolder(View itemView) {
             super(itemView);
             timeTextView = (TextView) itemView.findViewById(R.id.time_text_view);
             weatherCodeTextView = (TextView) itemView.findViewById(R.id.weather_code_text_view);
+            ivWeatherCode = (ImageView) itemView.findViewById(R.id.ivWeatherCode);
+
+            timeTextView.setTextColor(Color.BLACK);
+            weatherCodeTextView.setTextColor(Color.BLACK);
         }
     }
 }

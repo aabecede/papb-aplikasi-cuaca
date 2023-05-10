@@ -1,12 +1,18 @@
 package com.example.aplikasicuaca;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -34,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
             textWindSpeed,
             textWindDirection,
             textWeatherCode,
-            textIsDay,textTime;
+            textIsDay,textTime,textWeatherCodeText;
     private RecyclerView rvDailyWeather;
+    private ImageView ibWeatherImg;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -51,9 +58,24 @@ public class MainActivity extends AppCompatActivity {
         textWeatherCode = (TextView) findViewById(R.id.idWeatherCode);
         textIsDay = (TextView) findViewById(R.id.idIsDay);
         textTime = (TextView) findViewById(R.id.idTime);
+        textWeatherCodeText = (TextView) findViewById(R.id.idWeatherCodeText);
+
         rvDailyWeather = (RecyclerView) findViewById(R.id.rvDailyWeather);
         rvDailyWeather.setLayoutManager(new LinearLayoutManager( this));
 
+        ibWeatherImg = (ImageView) findViewById(R.id.idImageWeather);
+
+        // Get a reference to the root layout of your activity (e.g., ConstraintLayout, RelativeLayout)
+        ConstraintLayout rootLayout = findViewById(R.id.root_layout); // Replace with the ID of your root layout
+
+// Create a GradientDrawable for the background
+        GradientDrawable gradientDrawable = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM, // Set the gradient orientation from top to bottom
+                new int[] {Color.BLUE, Color.WHITE} // Define the colors for the gradient (start with blue, end with white)
+        );
+
+// Set the background of the root layout as the GradientDrawable
+        rootLayout.setBackground(gradientDrawable);
         getData();
     }
 
@@ -74,34 +96,27 @@ public class MainActivity extends AppCompatActivity {
                             textTimeZone.setText(json.getString("timezone"));
 
                             JSONObject jsonCurrentWinter = json.getJSONObject("current_weather");
+                            String weatherCode = jsonCurrentWinter.getString("weathercode");
                             textTemperature.setText(jsonCurrentWinter.getString("temperature"));
                             textWindSpeed.setText(jsonCurrentWinter.getString("windspeed"));
                             textWindDirection.setText(jsonCurrentWinter.getString("winddirection"));
-                            textWeatherCode.setText(jsonCurrentWinter.getString("weathercode"));
+                            textWeatherCode.setText(weatherCode);
                             textIsDay.setText(jsonCurrentWinter.getString("is_day"));
                             textTime.setText(jsonCurrentWinter.getString("time"));
+                            ibWeatherImg.setImageResource(WeatherUtils.getWeatherIcon(Integer.parseInt(weatherCode)));
+                            textWeatherCodeText.setText(WeatherUtils.getWeatherText(Integer.parseInt(weatherCode)));
 
                             JSONObject jsonDaily =  json.getJSONObject("daily");
                             JSONArray jsonDailyTime = jsonDaily.getJSONArray("time");
                             JSONArray jsonWeatherCode = jsonDaily.getJSONArray("weathercode");
                             int jumlahTime = jsonDaily.getJSONArray("time").length();
-//                            Log.e("api", "JumlahTIme " + jumlahTime);
-//                            Log.d("api", "cek cek " + json.getJSONObject("daily"));
+
                             for (int i=0; i< jumlahTime; i++){
-//                                Log.d("api", "msgTime " + jsonDailyTime.getString(i));
-//                                Log.d("api", "msgWeatherCode " + jsonWeatherCode.getString(i));
                                 ModelDailyWeather dailyWeatherObj = new ModelDailyWeather(jsonDailyTime.getString(i), jsonWeatherCode.getInt(i));
                                 modelDailyWeathers.add(dailyWeatherObj);
                             }
 
                             rvDailyWeather.setAdapter(new DailyWeatherAdapter(MainActivity.this.modelDailyWeathers));
-//    Log.e("api", "Model Deaily : " + modelDailyWeathers);
-//                            RecyclerView dailyWeatherRecyclerView = findViewById(R.id.rvDailyWeather);
-//                            DailyWeatherAdapter dailyWeatherAdapter = new DailyWeatherAdapter(modelDailyWeathers);
-//                            Log.d("aoi", "dailyWeatherAdapter :" + dailyWeatherAdapter);
-//                            dailyWeatherRecyclerView.setAdapter(dailyWeatherAdapter);
-//
-//                            Log.e("api", "successBro: " + modelDailyWeathers.size());
                         } catch (Throwable e){
                             e.printStackTrace();
                             Log.e("api", "error: " + e.getMessage());
