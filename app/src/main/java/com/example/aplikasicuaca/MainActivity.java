@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             textIsDay,textTime,textWeatherCodeText;
     private RecyclerView rvDailyWeather;
     private ImageView ibWeatherImg;
+    private ConstraintLayout rootLayout;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -64,18 +65,6 @@ public class MainActivity extends AppCompatActivity {
         rvDailyWeather.setLayoutManager(new LinearLayoutManager( this));
 
         ibWeatherImg = (ImageView) findViewById(R.id.idImageWeather);
-
-        // Get a reference to the root layout of your activity (e.g., ConstraintLayout, RelativeLayout)
-        ConstraintLayout rootLayout = findViewById(R.id.root_layout); // Replace with the ID of your root layout
-
-// Create a GradientDrawable for the background
-        GradientDrawable gradientDrawable = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM, // Set the gradient orientation from top to bottom
-                new int[] {Color.BLUE, Color.WHITE} // Define the colors for the gradient (start with blue, end with white)
-        );
-
-// Set the background of the root layout as the GradientDrawable
-        rootLayout.setBackground(gradientDrawable);
         getData();
     }
 
@@ -97,14 +86,39 @@ public class MainActivity extends AppCompatActivity {
 
                             JSONObject jsonCurrentWinter = json.getJSONObject("current_weather");
                             String weatherCode = jsonCurrentWinter.getString("weathercode");
+                            String isDay = jsonCurrentWinter.getString("is_day");
                             textTemperature.setText(jsonCurrentWinter.getString("temperature"));
                             textWindSpeed.setText(jsonCurrentWinter.getString("windspeed"));
                             textWindDirection.setText(jsonCurrentWinter.getString("winddirection"));
                             textWeatherCode.setText(weatherCode);
-                            textIsDay.setText(jsonCurrentWinter.getString("is_day"));
+                            textIsDay.setText(isDay);
                             textTime.setText(jsonCurrentWinter.getString("time"));
                             ibWeatherImg.setImageResource(WeatherUtils.getWeatherIcon(Integer.parseInt(weatherCode)));
                             textWeatherCodeText.setText(WeatherUtils.getWeatherText(Integer.parseInt(weatherCode)));
+
+                            //change backgroundColor
+                            // Get a reference to the root layout of your activity (e.g., ConstraintLayout, RelativeLayout)
+                            rootLayout = (ConstraintLayout) findViewById(R.id.root_layout); // Replace with the ID of your root layout
+                            if(Integer.parseInt(isDay) == 1){ //if day
+                                // Create a GradientDrawable for the background
+                                GradientDrawable gradientDrawable = new GradientDrawable(
+                                        GradientDrawable.Orientation.TOP_BOTTOM, // Set the gradient orientation from top to bottom
+                                        new int[] {Color.YELLOW, Color.WHITE} // Define the colors for the gradient
+                                );
+                                rootLayout.setBackground(gradientDrawable);
+                            }
+                            else{ //night
+                                // Create a GradientDrawable for the background
+                                GradientDrawable gradientDrawable = new GradientDrawable(
+                                        GradientDrawable.Orientation.TOP_BOTTOM, // Set the gradient orientation from top to bottom
+                                        new int[] {Color.CYAN, Color.WHITE} // Define the colors for the gradient
+                                );
+                                rootLayout.setBackground(gradientDrawable);
+                            }
+
+
+                            // Set the background of the root layout as the GradientDrawable
+
 
                             JSONObject jsonDaily =  json.getJSONObject("daily");
                             JSONArray jsonDailyTime = jsonDaily.getJSONArray("time");
