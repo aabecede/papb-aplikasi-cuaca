@@ -1,12 +1,12 @@
 package com.example.aplikasicuaca;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -17,15 +17,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
 
-//    List<WeatherModel> dataWeather;
+    List<ModelDailyWeather> modelDailyWeathers = new ArrayList<>();
     String  url = "https://api.open-meteo.com/v1/forecast?latitude=-7.98&longitude=112.63&daily=weathercode&current_weather=true&timezone=auto";
     private TextView textTemperature,
             textLatitude,
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
             textWindDirection,
             textWeatherCode,
             textIsDay,textTime;
+    private RecyclerView rvDailyWeather;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         textWeatherCode = (TextView) findViewById(R.id.idWeatherCode);
         textIsDay = (TextView) findViewById(R.id.idIsDay);
         textTime = (TextView) findViewById(R.id.idTime);
+        rvDailyWeather = (RecyclerView) findViewById(R.id.rvDailyWeather);
+        rvDailyWeather.setLayoutManager(new LinearLayoutManager( this));
 
         getData();
     }
@@ -78,7 +81,27 @@ public class MainActivity extends AppCompatActivity {
                             textIsDay.setText(jsonCurrentWinter.getString("is_day"));
                             textTime.setText(jsonCurrentWinter.getString("time"));
 
-                            Log.e("api", "successBro: " + json);
+                            JSONObject jsonDaily =  json.getJSONObject("daily");
+                            JSONArray jsonDailyTime = jsonDaily.getJSONArray("time");
+                            JSONArray jsonWeatherCode = jsonDaily.getJSONArray("weathercode");
+                            int jumlahTime = jsonDaily.getJSONArray("time").length();
+//                            Log.e("api", "JumlahTIme " + jumlahTime);
+//                            Log.d("api", "cek cek " + json.getJSONObject("daily"));
+                            for (int i=0; i< jumlahTime; i++){
+//                                Log.d("api", "msgTime " + jsonDailyTime.getString(i));
+//                                Log.d("api", "msgWeatherCode " + jsonWeatherCode.getString(i));
+                                ModelDailyWeather dailyWeatherObj = new ModelDailyWeather(jsonDailyTime.getString(i), jsonWeatherCode.getInt(i));
+                                modelDailyWeathers.add(dailyWeatherObj);
+                            }
+
+                            rvDailyWeather.setAdapter(new DailyWeatherAdapter(MainActivity.this.modelDailyWeathers));
+//    Log.e("api", "Model Deaily : " + modelDailyWeathers);
+//                            RecyclerView dailyWeatherRecyclerView = findViewById(R.id.rvDailyWeather);
+//                            DailyWeatherAdapter dailyWeatherAdapter = new DailyWeatherAdapter(modelDailyWeathers);
+//                            Log.d("aoi", "dailyWeatherAdapter :" + dailyWeatherAdapter);
+//                            dailyWeatherRecyclerView.setAdapter(dailyWeatherAdapter);
+//
+//                            Log.e("api", "successBro: " + modelDailyWeathers.size());
                         } catch (Throwable e){
                             e.printStackTrace();
                             Log.e("api", "error: " + e.getMessage());
