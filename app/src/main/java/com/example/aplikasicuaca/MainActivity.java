@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        /**
+         * Declare variable" dari layout.xml
+         */
         textLatitude = (TextView) findViewById(R.id.idLatitude);
         textLongitude = (TextView) findViewById(R.id.idLongitude);
         textTimeZone = (TextView) findViewById(R.id.idTimeZone);
@@ -68,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
         getData();
     }
 
+    /**
+     * proses untuk mendapatkan data dari URL dengan library Volley
+     */
     private void getData() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -84,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
                             textLongitude.setText(json.getString("longitude"));
                             textTimeZone.setText(json.getString("timezone"));
 
+                            /**
+                             * mengambil isian dari current_weather
+                             */
                             JSONObject jsonCurrentWinter = json.getJSONObject("current_weather");
                             String weatherCode = jsonCurrentWinter.getString("weathercode");
                             String isDay = jsonCurrentWinter.getString("is_day");
